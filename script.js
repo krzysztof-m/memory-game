@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
   var tilesNumber = 16,
       counterToEnd,
@@ -18,16 +17,17 @@ $(document).ready(function() {
         'bug'
       ],
       colors = [
-        '#ff0',
-        '#000',
-        '#333',
-        '#999',
-        '#0f0',
-        '#f00',
-        '#00f',
-        '#09f',
+        'rgba(102, 153, 0,.5)',
+        'rgba(255, 153, 0,.5)',
+        'rgba(204, 0, 0,.5)',
+        'rgba(153, 0, 255,.5)',
+        'rgba(102, 0, 51,.5)',
+        'rgba(102, 51, 0,.5)',
+        'rgba(0, 102, 153,.5)',
+        'rgba(51, 153, 255,.5)',
       ],
-      $board = $('.board');
+      $board = $('.board'),
+      $counter = $('#counter');
   
   function makeTilesArray(array, number) {
     for (var i = 0; i < tilesNumber; i++) {
@@ -47,13 +47,17 @@ $(document).ready(function() {
   }
   function toggleTile($tile,option) {
     var $icon = $tile.find('.fa');
-    if (option === 'show')
+    if (option === 'show') {
       $icon.removeClass('fa-question').addClass('fa-' + $tile.data('icon'));
-    else if (option === 'hide')
+      $tile.css('background-color',colors[$tile.data('number')]);
+    }
+    else if (option === 'hide') {
       setTimeout(function() {
         $icon.removeClass('fa-' + $tile.data('icon')).addClass('fa-question');
+        $tile.css('background-color','rgba(255, 255, 255, 0.5)');
         selectedTilesShow = false;
       },1000);
+    }
   }
   function drawTiles(array) {
     for (var i = 0; i < array.length; i++) {
@@ -74,6 +78,7 @@ $(document).ready(function() {
         
         if (selectedTiles.length === 2) {
           selectedTilesShow = true;
+          counter++;
           if (selectedTiles[0].data('number') === selectedTiles[1].data('number')) {
             selectedTilesShow = false;
             selectedTiles.forEach(function($tile) {
@@ -84,7 +89,7 @@ $(document).ready(function() {
               $tile.off('click');
             });
             if (!(--counterToEnd)) {
-              alert("Won");
+              alert("You win");
               startGame();
             }
           } else {
@@ -92,9 +97,9 @@ $(document).ready(function() {
               toggleTile($tile,'hide');
             });
           }
-          counter++;
           previousTile = null;
           selectedTiles = [];
+          updateCounter();
         } else {
           previousTile = this;
         }
@@ -103,9 +108,14 @@ $(document).ready(function() {
       tile.appendTo($board);
     }
   }
+  function updateCounter() {
+    $counter.text(counter);
+  }
   function startGame() {
     tiles = [];
     counterToEnd = (tilesNumber / 2);
+    counter = 0;
+    updateCounter();
     $board.empty();
     makeTilesArray(tiles);
     shuffleArray(tiles);
